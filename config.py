@@ -8,16 +8,15 @@ load_dotenv()
 
 API_ID = 20948356
 API_HASH = "6b202043d2b3c4db3f4ebefb06f2df12"
-BOT_TOKEN = "7809892112:AAHLoiY41jC6NaAgNyq4OduESMoPjEpq2vQ"
-MONGO_DB_URI = "mongodb+srv://Elapsed:Elapsed@yumi.inctk.mongodb.net/?retryWrites=true&w=majority&appName=Elapsed"
+BOT_TOKEN = "8118270568:AAFszaCQOqFRouEnmLDG5x_ooxnhpcB3E98"
+MONGO_DB_URI = "mongodb+srv://Yumi:Yumi@yumi.inctk.mongodb.net/?retryWrites=true&w=majority&appName=Yumi"
 
 DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 60))
 
 LOGGER_ID = -1002063031380
-OWNER_ID = 7337748194
+OWNER_ID = 7394132959
 CHANNEL_ID = -1002059639505
 
-Helpers = [7337748194, 7202110938, 6648618400]
 
 HEROKU_APP_NAME = getenv("HEROKU_APP_NAME")
 HEROKU_API_KEY = getenv("HEROKU_API_KEY")
