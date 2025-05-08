@@ -9,7 +9,6 @@ from Elapsed.misc import sudo
 from Elapsed.plugins import ALL_MODULES
 from Elapsed.utils.database import get_banned_users, get_gbanned
 from config import BANNED_USERS
-from Elapsed.plugins.bot.clone import restart_bots
 
 
 async def init():
@@ -23,7 +22,6 @@ async def init():
             BANNED_USERS.add(user_id)
     except:
         pass
-    await restart_bots()
     await app.start()
     for all_module in ALL_MODULES:
         importlib.import_module("Elapsed.plugins" + all_module)
