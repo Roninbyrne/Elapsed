@@ -13,7 +13,7 @@ MONGO_DB_URI = "mongodb+srv://Yumi:Yumi@yumi.inctk.mongodb.net/?retryWrites=true
 
 DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 60))
 
-LOGGER_ID = -1002063031380
+LOGGER_ID = -1002059639505
 OWNER_ID = 7394132959
 CHANNEL_ID = -1002059639505
 
