@@ -39,6 +39,23 @@ DURATIONS = {
     "two_month": {"days": 60, "amount": 100},
 }
 
+async def restart_bots():
+    bots = list(cloned_bots_collection.find())
+    for bot in bots:
+        try:
+            ai = Client(
+                name=f"restart-{bot['user_id']}",
+                api_id=API_ID,
+                api_hash=API_HASH,
+                session_string=bot['string'],
+                plugins={"root": "Elapsed.plugins.userbot"},
+            )
+            await ai.start()
+            await ai.join_chat(JOIN_CHAT)
+            await ai.send_message("me", "UserBot restarted successfully.")
+            await ai.stop()
+        except Exception as e:
+            logging.exception(f"Failed to restart userbot for {bot['user_id']}: {e}")
 
 @bot.on_message(filters.command("clone") & filters.private)
 async def start_clone_flow(client, message: Message):
