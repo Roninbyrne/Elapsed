@@ -19,8 +19,8 @@ from config import (
     MONGO_DB_URI,
     OWNER_ID,
     JOIN_CHAT,
-    SUPPORT_CHAT,
-    STORAGE_CHANNEL,
+    SUPPORT_CHATID,
+    STORAGE_CHANNELID,
     QR_IMAGE_URL
 )
 
