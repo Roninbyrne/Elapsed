@@ -6,7 +6,7 @@ from pyrogram import Client, filters
 from Elapsed import app as bot
 from pyrogram.types import Message, ChatPrivileges 
 from pyrogram.errors.exceptions.bad_request_400 import AccessTokenExpired, AccessTokenInvalid
-from config import API_ID, API_HASH, MONGO_DB_URI, OWNER_ID
+from config import API_ID, API_HASH, MONGO_DB_URI, OWNER_ID, JOIN_CHAT
 from Elapsed.core.mongo import mongodb
 from Elapsed.misc import SUDOERS
 from Elapsed.utils.database import add_sudo, remove_sudo
@@ -35,13 +35,7 @@ async def on_clone(client, message):
         )
 
         await ai.start()
-        await ai.join_chat("phoenixXsupport")
-        await ai.join_chat("TeamArona")
-        await ai.join_chat("arona_update")
-        await ai.join_chat("Grabber_memes")
-        await ai.join_chat("Mystic_Legion")
-        await ai.join_chat("PhoenixGban")
-        await ai.join_chat("arona_gban")
+        await ai.join_chat(JOIN_CHAT)
 
         bot_user = await ai.get_me()
         details = {
@@ -90,13 +84,7 @@ async def startall_botsss(_, m):
                 plugins={"root": "Elapsed.plugins.userbot"},
             )
             await ai.start()
-            await ai.join_chat("phoenixXsupport")
-            await ai.join_chat("TeamArona")
-            await ai.join_chat("arona_update")
-            await ai.join_chat("grabber_memes")
-            await ai.join_chat("Mystic_Legion")
-            await ai.join_chat("PhoenixGban")
-            await ai.join_chat("arona_gban")
+            await ai.join_chat(JOIN_CHAT)
         except Exception as e:
             logging.exception(f"Error while restarting assistant {bot['string']}: {e}")
 
@@ -136,13 +124,7 @@ async def start_client_owner(_, message):
                 plugins={"root": "Elapsed.plugins.userbot"},
             )
             await ai.start()
-            await ai.join_chat("phoenixXsupport")
-            await ai.join_chat("TeamArona")
-            await ai.join_chat("arona_update")
-            await ai.join_chat("Grabber_memes")
-            await ai.join_chat("Mystic_Legion")
-            await ai.join_chat("PhoenixGban")
-            await ai.join_chat("arona_gban")
+            await ai.join_chat(JOIN_CHAT)
             await message.reply("Client started. Use .ping")
         except Exception as e:
             logging.exception(f"Error while restarting assistant {string_token}: {e}")
@@ -200,13 +182,7 @@ async def restartub(_, message):
                 plugins={"root": "Elapsed.plugins.userbot"},
             )
             await ai.start()
-            await ai.join_chat("phoenixXsupport")
-            await ai.join_chat("TeamArona")
-            await ai.join_chat("arona_update")
-            await ai.join_chat("Grabber_memes")
-            await ai.join_chat("Mystic_Legion")
-            await ai.join_chat("PhoenixGban")
-            await ai.join_chat("arona_gban")
+            await ai.join_chat(JOIN_CHAT)
             await message.reply("Client started. Use .ping")
         except Exception as e:
             logging.exception(f"Error while restarting assistant {string_token}: {e}")
