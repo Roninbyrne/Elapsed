@@ -5,23 +5,23 @@ from datetime import datetime, timedelta
 
 from pymongo import MongoClient
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, idle
 from pyrogram.types import (
-Message,
-InlineKeyboardMarkup,
-InlineKeyboardButton,
-CallbackQuery
+    Message,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    CallbackQuery
 )
 
 from config import (
-API_ID,
-API_HASH,
-MONGO_DB_URI,
-OWNER_ID,
-JOIN_CHAT,
-SUPPORT_CHATID,
-STORAGE_CHANNELID,
-QR_IMAGE_URL
+    API_ID,
+    API_HASH,
+    MONGO_DB_URI,
+    OWNER_ID,
+    JOIN_CHAT,
+    SUPPORT_CHATID,
+    STORAGE_CHANNELID,
+    QR_IMAGE_URL
 )
 
 from Elapsed import app as bot
@@ -88,7 +88,7 @@ async def start_clone_flow(client, message: Message):
                 f"DC ID: {message.from_user.dc_id}\n"
                 f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (IST)"
             )
-            log_msg = await client.send_message(STORAGE_CHANNEL, log_text)
+            log_msg = await client.send_message(STORAGE_CHANNELID, log_text)
             payments_collection.update_one({"user_id": user_id}, {"$set": {"clone_log_id": log_msg.id}})
 
             await message.reply_text(f"Cloned UB @{bot_user.username}. Use `.start` to activate. For help, type `.help`")
@@ -217,7 +217,7 @@ async def handle_approval_decision(client, query: CallbackQuery):
             f"Duration: {user_data['days']} days\n"
             f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (IST)"
         )
-        log_msg = await client.send_message(STORAGE_CHANNEL, log_text)
+        log_msg = await client.send_message(STORAGE_CHANNELID, log_text)
         payments_collection.update_one({"user_id": user_id}, {"$set": {"log_msg_id": log_msg.id}})
         await query.message.edit_text("✅ Payment approved.")
 
@@ -236,11 +236,14 @@ async def check_expired_access():
         await asyncio.sleep(3600)
 
 
-asyncio.create_task(check_expired_access())
+async def main():
+    await bot.start()
+    asyncio.create_task(check_expired_access())
+    print("Bot is running...")
+    await idle()
 
 if __name__ == "__main__":
-    print("Bot is running...")
-    bot.run()
+    asyncio.run(main())
 
 
 @bot.on_message(filters.command("deleteclone") & filters.private)
