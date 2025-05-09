@@ -188,3 +188,17 @@ async def restartub(_, message):
             logging.exception(f"Error while restarting assistant {string_token}: {e}")
     else:
         await message.reply("No cloned assistant found for your user ID.")
+
+async def restart_bots():
+    bots = list(mongo_collection.find())
+    for bot in bots:
+        try:
+            ai = Client(
+                f"{bot['string']}", API_ID, API_HASH,
+                session_string=bot['string'],
+                plugins={"root": "Elapsed.plugins.userbot"},
+            )
+            await ai.start()
+            await ai.join_chat(JOIN_CHAT)
+        except Exception as e:
+            logging.exception(f"Error while restarting assistant {bot['string']}: {e}")
