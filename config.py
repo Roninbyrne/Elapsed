@@ -9,6 +9,7 @@ load_dotenv()
 API_ID = 20948356
 API_HASH = "6b202043d2b3c4db3f4ebefb06f2df12"
 BOT_TOKEN = "8118270568:AAFszaCQOqFRouEnmLDG5x_ooxnhpcB3E98"
+JOIN_CHAT = "ProjectElapsed"
 MONGO_DB_URI = "mongodb+srv://Yumi:Yumi@yumi.inctk.mongodb.net/?retryWrites=true&w=majority&appName=Yumi"
 
 DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 60))
