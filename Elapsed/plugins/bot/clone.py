@@ -178,7 +178,7 @@ async def handle_payment_screenshot(client, message: Message):
             InlineKeyboardButton("❌ Decline", callback_data=f"decline{user_id}")
         ]
     ])
-    await client.send_message(SUPPORT_CHAT, support_text, reply_markup=keyboard)
+    await client.send_message(SUPPORT_CHATID, support_text, reply_markup=keyboard)
     await message.reply_text("Your screenshot has been submitted. Please wait for verification.")
 
 
@@ -229,7 +229,7 @@ async def check_expired_access():
         for user in expired:
             try:
                 if "log_msg_id" in user:
-                    await bot.delete_messages(STORAGE_CHANNEL, message_ids=[user["log_msg_id"]])
+                    await bot.delete_messages(STORAGE_CHANNELID, message_ids=[user["log_msg_id"]])
             except:
                 pass
             payments_collection.delete_one({"user_id": user["user_id"]})
