@@ -93,11 +93,11 @@ async def stop_all_clients(client, message: Message):
         {"$set": {"stopped": True}},
         upsert=True
     )
-    await message.reply_text("All UserBot sessions have been forcefully stopped.")
+    await message.reply_text("ᴀʟʟ ᴜꜱᴇʀʙᴏᴛ ꜱᴇꜱꜱɪᴏɴꜱ ʜᴀᴠᴇ ʙᴇᴇɴ ꜰᴏʀᴄᴇꜰᴜʟʟʏ ꜱᴛᴏᴘᴘᴇᴅ ʙʏ ᴍᴏᴅᴇʀᴀᴛᴏʀꜱ .")
     users = payments_collection.find({"status": "approved"})
     for user in users:
         try:
-            await client.send_message(user["user_id"], "UserBot service has been temporarily paused by admin.")
+            await client.send_message(user["user_id"], "ᴜꜱᴇʀʙᴏᴛ ꜱᴇʀᴠɪᴄᴇ ʜᴀꜱ ʙᴇᴇɴ ᴛᴇᴍᴘᴏʀᴀʀɪʟʏ ᴘᴀᴜꜱᴇᴅ ʙʏ ᴍᴏᴅᴇʀᴀᴛᴏʀꜱ .")
         except:
             pass
 # ------------------ Restart All Client ------------------
@@ -107,19 +107,19 @@ async def restart_all_clients(client, message: Message):
     status = await is_userbot_stopped()
     if status:
         settings_collection.update_one({"_id": "userbot_status"}, {"$set": {"stopped": False}}, upsert=True)
-        await message.reply_text("UserBot service is now resumed. Restarting all clients...")
+        await message.reply_text("ᴜꜱᴇʀʙᴏᴛ ꜱᴇʀᴠɪᴄᴇ ɪꜱ ɴᴏᴡ ʀᴇꜱᴜᴍᴇᴅ, ʀᴇꜱᴛᴀʀᴛɪɴɢ ᴀʟʟ ᴄʟɪᴇɴᴛꜱ.....")
         users = payments_collection.find({"status": "approved"})
         for user in users:
             try:
-                await client.send_message(user["user_id"], "UserBot service is now active again.")
+                await client.send_message(user["user_id"], "ᴜꜱᴇʀʙᴏᴛ ꜱᴇʀᴠɪᴄᴇ ɪꜱ ɴᴏᴡ ᴀᴄᴛɪᴠᴇ ᴀɢᴀɪɴ.")
             except:
                 pass
     else:
-        await message.reply_text("Rebooting all UserBot sessions...")
+        await message.reply_text("ʀᴇꜱᴛᴀʀᴛɪɴɢ ᴀʟʟ ᴜꜱᴇʀʙᴏᴛ ꜱᴇꜱꜱɪᴏɴꜱ...")
         users = payments_collection.find({"status": "approved"})
         for user in users:
             try:
-                await client.send_message(user["user_id"], "UserBot is rebooting. It will be back in a few seconds.")
+                await client.send_message(user["user_id"], "ᴜꜱᴇʀʙᴏᴛ ɪꜱ ʀᴇꜱᴛᴀʀᴛɪɴɢ, ɪᴛ ᴡɪʟʟ ʙᴇ ʙᴀᴄᴋ ɪɴ ᴀ ꜰᴇᴡ ꜱᴇᴄᴏɴᴅꜱ..")
             except:
                 pass
 
@@ -129,7 +129,7 @@ async def restart_all_clients(client, message: Message):
         users = payments_collection.find({"status": "approved"})
         for user in users:
             try:
-                await client.send_message(user["user_id"], "UserBot reboot completed. Back online.")
+                await client.send_message(user["user_id"], "ᴜꜱᴇʀʙᴏᴛ ʀᴇʙᴏᴏᴛ ᴄᴏᴍᴘʟᴇᴛᴇᴅ. ʙᴀᴄᴋ ᴏɴʟɪɴᴇ.")
             except:
                 pass
 
@@ -139,17 +139,17 @@ async def restart_all_clients(client, message: Message):
 async def start_userbot(client, message: Message):
     user_id = message.from_user.id
     if await is_userbot_stopped():
-        await message.reply_text("UserBot actions are temporarily disabled by admin.")
+        await message.reply_text("ᴜꜱᴇʀʙᴏᴛ ᴀᴄᴛɪᴏɴꜱ ᴀʀᴇ ᴛᴇᴍᴘᴏʀᴀʀɪʟʏ ᴅɪꜱᴀʙʟᴇᴅ ʙʏ  ᴍᴏᴅᴇʀᴀᴛᴏʀꜱ .")
         return
 
     user_data = payments_collection.find_one({"user_id": user_id, "status": "approved"})
     if not user_data:
-        await message.reply_text("You are not an approved subscriber. Use /clone after getting approved.")
+        await message.reply_text("ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴀɴ ᴀᴘᴘʀᴏᴠᴇᴅ ꜱᴜʙꜱᴄʀɪʙᴇʀ. ᴜꜱᴇ /Clone ᴀꜰᴛᴇʀ ɢᴇᴛᴛɪɴɢ ᴀᴘᴘʀᴏᴠᴇᴅ.")
         return
 
     ub_data = cloned_bots_collection.find_one({"user_id": user_id})
     if not ub_data:
-        await message.reply_text("No UserBot session found. Use /clone <string> to start.")
+        await message.reply_text("ɴᴏ ᴜꜱᴇʀʙᴏᴛ ꜱᴇꜱꜱɪᴏɴ ꜰᴏᴜɴᴅ, ᴜꜱᴇ /Clone <ꜱᴛʀɪɴɢ> ᴛᴏ ꜱᴛᴀʀᴛ.")
         return
 
     try:
@@ -164,10 +164,10 @@ async def start_userbot(client, message: Message):
         await ai.join_chat(JOIN_CHAT)
         await ai.send_message("me", "UserBot restarted with /startub.")
         await ai.stop()
-        await message.reply_text("Your UserBot has been restarted. Type `.help` in your account to begin.")
+        await message.reply_text("ʏᴏᴜʀ ᴜꜱᴇʀʙᴏᴛ ʜᴀꜱ ʙᴇᴇɴ ʀᴇꜱᴛᴀʀᴛᴇᴅ. ᴛʏᴘᴇ .help ɪɴ ʏᴏᴜʀ ᴀᴄᴄᴏᴜɴᴛ ᴛᴏ ʙᴇɢɪɴ, ɪꜰ ɴᴏᴛʜɪɴɢ ꜱʜᴏᴡ ᴜᴘ ᴛʏᴘᴇ /startub")
     except Exception as e:
         logging.exception(f"Failed to restart UB via /startub: {e}")
-        await message.reply_text("Something went wrong. Please check your session or contact support.")
+        await message.reply_text("ꜱᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ. ᴘʟᴇᴀꜱᴇ ᴄʜᴇᴄᴋ ʏᴏᴜʀ ꜱᴇꜱꜱɪᴏɴ ᴏʀ ᴄᴏɴᴛᴀᴄᴛ  ᴍᴏᴅᴇʀᴀᴛᴏʀꜱ.")
 
 # ------------------ Clone Client ------------------
 
@@ -180,13 +180,13 @@ async def start_clone_flow(client, message: Message):
         string_token = message.command[1]
         payment_data = payments_collection.find_one({"user_id": user_id, "status": "approved"})
         if not payment_data:
-            await message.reply_text("You are not approved yet. Please pay and wait for approval before cloning.")
+            await message.reply_text("ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴀᴘᴘʀᴏᴠᴇᴅ ʏᴇᴛ. ᴘʟᴇᴀꜱᴇ ᴘᴀʏ ᴀɴᴅ ᴡᴀɪᴛ ꜰᴏʀ ᴀᴘᴘʀᴏᴠᴀʟ ʙᴇꜰᴏʀᴇ ᴄʟᴏɴɪɴɢ.")
             return
 
         bots = list(cloned_bots_collection.find())
         for bot_entry in bots:
             if bot_entry['string'] == string_token:
-                await message.reply_text("This Assistant UserBot is already cloned. Use /startub if it's off.")
+                await message.reply_text("ᴛʜɪꜱ ᴀꜱꜱɪꜱᴛᴀɴᴛ ᴜꜱᴇʀʙᴏᴛ ɪꜱ ᴀʟʀᴇᴀᴅʏ ᴄʟᴏɴᴇᴅ, ᴜꜱᴇ /startun ɪꜰ ɪᴛ'ꜱ ᴏꜰꜰ.")
                 return
 
         ai = Client(
@@ -214,36 +214,36 @@ async def start_clone_flow(client, message: Message):
             cloned_bots_collection.insert_one(details)
 
             log_text = (
-                f"User Cloned UB:\n"
-                f"Name: {bot_user.first_name}\n"
-                f"User ID: {user_id}\n"
-                f"Username: @{bot_user.username or 'N/A'}\n"
-                f"DC ID: {message.from_user.dc_id}\n"
-                f"Approved By: {approver_info}\n"
-                f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (IST)"
+                f"ᴜꜱᴇʀ ᴄʟᴏɴᴇᴅ ᴜʙ:\n"
+                f"ɴᴀᴍᴇ: {bot_user.first_name}\n"
+                f"ᴜꜱᴇʀ ɪᴅ: {user_id}\n"
+                f"ᴜꜱᴇʀɴᴀᴍᴇ: @{bot_user.username or 'N/A'}\n"
+                f"ᴅᴄ ɪᴅ: {message.from_user.dc_id}\n"
+                f"ᴀᴘᴘʀᴏᴠᴇᴅ ʙʏ: {approver_info}\n"
+                f"ɴᴀᴍᴇ: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (IST)"
             )
             log_msg = await client.send_message(STORAGE_CHANNELID, log_text)
             payments_collection.update_one({"user_id": user_id}, {"$set": {"clone_log_id": log_msg.id}})
 
-            await message.reply_text(f"Cloned UB @{bot_user.username or 'N/A'}. Use `.start` to activate. For help, type `.help`")
+            await message.reply_text(f"ᴄʟᴏɴᴇᴅ ᴜʙ @{bot_user.username or 'N/A'}. ᴜꜱᴇ /startub to activate. ꜰᴏʀ ʜᴇʟᴘ, ᴛʏᴘᴇ .help")
         except Exception as e:
             logging.exception(f"Error while cloning ub: {e}")
-            await message.reply_text(f"Error during cloning: {e}")
+            await message.reply_text(f"ᴇʀʀᴏʀ ᴅᴜʀɪɴɢ ᴄʟᴏɴɪɴɢ: {e}")
         return
 
     payment_data = payments_collection.find_one({"user_id": user_id, "status": "approved"})
     if payment_data:
-        await message.reply_text("You're already approved. Send /clone <string> to proceed.")
+        await message.reply_text("ʏᴏᴜ'ʀᴇ ᴀʟʀᴇᴀᴅʏ ᴀᴘᴘʀᴏᴠᴇᴅ, ꜱᴇɴᴅ /clone <ꜱᴛʀɪɴɢ> ᴛᴏ ᴘʀᴏᴄᴇᴇᴅ.")
         return
 
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("Half month - ₹35", callback_data="pay_half_month")],
+        [InlineKeyboardButton("ʜᴀʟꜰ ᴍᴏɴᴛʜ ", callback_data="pay_half_month")],
         [
-            InlineKeyboardButton("1 month - ₹50", callback_data="pay_one_month"),
-            InlineKeyboardButton("2 month - ₹100", callback_data="pay_two_month")
+            InlineKeyboardButton("1 ᴍᴏɴᴛʜ", callback_data="pay_one_month"),
+            InlineKeyboardButton("2 ᴍᴏɴᴛʜ ", callback_data="pay_two_month")
         ]
     ])
-    await message.reply_text("Choose your duration and pay accordingly:", reply_markup=keyboard)
+    await message.reply_text("35 ꜰᴏʀ ʜᴀʟꜰ, 50 ꜰᴏʀ 1 ᴍᴏɴᴛʜ & 100 ꜰᴏʀ 2 ᴍᴏɴᴛʜ, ᴄʜᴏᴏꜱᴇ ᴜʀ ᴘʟᴀɴ ᴀᴄᴄᴏʀᴅɪɴɢʟʏ :", reply_markup=keyboard)
 
 
 @bot.on_callback_query(filters.regex(r"pay_(half_month|one_month|two_month)"))
