@@ -421,7 +421,7 @@ async def quit_userbot(client, message: Message):
         try:
             await client.send_message(
                 admin_id,
-                f"ᴜꜱᴇʀ {message.from_user.first_name} (ID: {user_id}) has quit their UserBot session."
+                f"ᴜꜱᴇʀ {message.from_user.first_name} (ID: {user_id}) ʜᴀꜱ Qᴜɪᴛ ᴛʜᴇɪʀ ᴜꜱᴇʀʙᴏᴛ ꜱᴇꜱꜱɪᴏɴ."
             )
         except:
             pass
