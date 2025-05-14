@@ -337,11 +337,22 @@ async def handle_callbacks(client, callback_query: CallbackQuery):
     elif data.startswith("terminate_all_"):
         cloned_bots_collection.delete_one({"user_id": target_id})
         sub = payments_collection.find_one({"user_id": target_id})
+
         if sub and "log_msg_id" in sub:
             try:
                 await bot.delete_messages(STORAGE_CHANNELID, message_ids=[sub["log_msg_id"]])
             except:
                 pass
+
+        if sub and "clone_log_id" in sub:
+            try:
+                original_msg = await bot.get_messages(STORAGE_CHANNELID, sub["clone_log_id"])
+                terminated_by = f"\nTerminated by: {callback_query.from_user.first_name} (@{callback_query.from_user.username or 'N/A'})"
+                updated_text = original_msg.text + terminated_by
+                await bot.edit_message_text(STORAGE_CHANNELID, sub["clone_log_id"], updated_text)
+            except:
+                pass
+
         payments_collection.delete_one({"user_id": target_id})
         await callback_query.answer(f"All data for {name} ({target_id}) has been terminated.", show_alert=True)
         await callback_query.edit_message_text(f"All data for {name} ({target_id}) has been terminated.")
