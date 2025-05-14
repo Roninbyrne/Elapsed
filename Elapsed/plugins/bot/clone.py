@@ -391,10 +391,10 @@ async def monthly_summary_task():
 
         await bot.send_message(pyrecordcn,
                                f"#MonthlySummary\n\n"
-                               f"Month: {month_name}\n"
-                               f"Period: 1st to {last_day}\n"
-                               f"Total Revenue: ₹{total}\n"
-                               f"Total Profit: ₹{total}")
+                               f"ᴍᴏɴᴛʜ : {month_name}\n"
+                               f"ᴘᴇʀɪᴏᴅ : 1st to {last_day}\n"
+                               f"ᴛᴏᴛᴀʟ ʀᴇᴠᴇɴᴜᴇ : ₹{total}\n"
+                               f"ᴛᴏᴛᴀʟ ᴘʀᴏꜰɪᴛ : ₹{total}")
 
         await asyncio.sleep(90)
 
@@ -411,17 +411,17 @@ async def quit_userbot(client, message: Message):
 
     ub_data = cloned_bots_collection.find_one({"user_id": user_id})
     if not ub_data:
-        await message.reply_text("No UserBot session found to quit.")
+        await message.reply_text("ɴᴏ ᴜꜱᴇʀʙᴏᴛ ꜱᴇꜱꜱɪᴏɴ ꜰᴏᴜɴᴅ ᴛᴏ Qᴜɪᴛ.")
         return
 
     cloned_bots_collection.delete_one({"user_id": user_id})
-    await message.reply_text("Your UserBot session has been successfully removed. You can /clone again anytime.")
+    await message.reply_text("ʏᴏᴜʀ ᴜꜱᴇʀʙᴏᴛ ꜱᴇꜱꜱɪᴏɴ ʜᴀꜱ ʙᴇᴇɴ ꜱᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ ʀᴇᴍᴏᴠᴇᴅ. ʏᴏᴜ ᴄᴀɴ /ᴄʟᴏɴᴇ ᴀɢᴀɪɴ ᴀɴʏᴛɪᴍᴇ.")
     
     for admin_id in HELPERS:
         try:
             await client.send_message(
                 admin_id,
-                f"User {message.from_user.first_name} (ID: {user_id}) has quit their UserBot session."
+                f"ᴜꜱᴇʀ {message.from_user.first_name} (ID: {user_id}) has quit their UserBot session."
             )
         except:
             pass
