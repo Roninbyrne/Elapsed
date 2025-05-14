@@ -246,51 +246,80 @@ async def handle_approval_decision(client, query: CallbackQuery):
         await query.message.edit_text("✅ Payment approved.")
 
 
-@bot.on_message(filters.command("terminate") & filters.user(HELPERS))
-async def terminate_user(client, message: Message):
-    user = None
-    user_id = None
-    name = None
+@bot.on_message(filters.command("manageuser") & filters.user(HELPERS))
+async def manage_user(client, message: Message):
+    if not message.reply_to_message:
+        await message.reply_text("Reply to the user you want to manage.")
+        return
 
-    if message.reply_to_message:
-        user = message.reply_to_message.from_user
-        user_id = user.id
-        name = user.first_name
-    elif len(message.command) >= 2:
-        identifier = message.command[1]
-        if identifier.startswith("@"):            
-            try:
-                user = await client.get_users(identifier)
-                user_id = user.id
-                name = user.first_name
-            except:
-                await message.reply_text("User not found.")
-                return
-        else:
-            try:
-                user_id = int(identifier)
-                user = await client.get_users(user_id)
-                name = user.first_name
-            except:
-                await message.reply_text("Invalid user ID.")
-                return
+    user = message.reply_to_message.from_user
+    user_id = user.id
+    name = user.first_name
+
+    subscription = payments_collection.find_one({"user_id": user_id, "status": "approved"})
+    if not subscription:
+        await message.reply_text(f"{name} ({user_id}) does not have an active subscription.")
+        return
+
+    cloned = cloned_bots_collection.find_one({"user_id": user_id})
+
+    buttons = []
+    if cloned:
+        buttons.extend([
+            [InlineKeyboardButton("Terminate Sessions", callback_data=f"terminate_ub_{user_id}")],
+            [InlineKeyboardButton("Terminate Subscription", callback_data=f"terminate_sub_{user_id}")],
+            [InlineKeyboardButton("Terminate All", callback_data=f"terminate_all_{user_id}")]
+        ])
     else:
-        await message.reply_text("Reply to a user or provide their ID/username.\nUsage: `/terminate <user_id or @username>`", parse_mode="markdown")
-        return
+        buttons.append([InlineKeyboardButton("Terminate Subscription", callback_data=f"terminate_sub_{user_id}")])
+    
+    buttons.append([InlineKeyboardButton("Cancel", callback_data="cancel_manage")])
 
-    bot_entry = cloned_bots_collection.find_one({"user_id": user_id})
-    if not bot_entry:
-        await message.reply_text(f"{name} ({user_id}) is not part of any active UB.")
-        return
+    markup = InlineKeyboardMarkup(buttons)
+    await message.reply_text(
+        f"What do you want to do with {name} ({user_id})?",
+        reply_markup=markup
+    )
 
-    cloned_bots_collection.delete_one({"user_id": user_id})
-    try:
-        await client.send_message(user_id, "You have been terminated from the service.")
-    except:
-        pass
+@bot.on_callback_query()
+async def handle_callbacks(client, callback_query: CallbackQuery):
+    user_id = callback_query.from_user.id
 
-    await message.reply_text(f"✅ {name} ({user_id}) has been terminated from UB.")
+    if user_id not in HELPERS:
+        return await callback_query.answer("You are not authorized to use this.", show_alert=True)
 
+    data = callback_query.data
+
+    if data.startswith("terminate_ub_"):
+        target_id = int(data.split("_")[-1])
+        cloned_bots_collection.delete_one({"user_id": target_id})
+        await callback_query.edit_message_text(f"Cloned session for {target_id} terminated.")
+
+    elif data.startswith("terminate_sub_"):
+        target_id = int(data.split("_")[-1])
+        sub = payments_collection.find_one({"user_id": target_id})
+        if sub and "log_msg_id" in sub:
+            try:
+                await bot.delete_messages(STORAGE_CHANNELID, message_ids=[sub["log_msg_id"]])
+            except:
+                pass
+        payments_collection.delete_one({"user_id": target_id})
+        await callback_query.edit_message_text(f"Subscription for {target_id} terminated.")
+
+    elif data.startswith("terminate_all_"):
+        target_id = int(data.split("_")[-1])
+        cloned_bots_collection.delete_one({"user_id": target_id})
+        sub = payments_collection.find_one({"user_id": target_id})
+        if sub and "log_msg_id" in sub:
+            try:
+                await bot.delete_messages(STORAGE_CHANNELID, message_ids=[sub["log_msg_id"]])
+            except:
+                pass
+        payments_collection.delete_one({"user_id": target_id})
+        await callback_query.edit_message_text(f"All data for {target_id} has been terminated.")
+
+    elif data == "cancel_manage":
+        await callback_query.edit_message_text("Operation cancelled.")
 
 async def check_expired_access():
     while True:
