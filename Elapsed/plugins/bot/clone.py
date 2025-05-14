@@ -280,3 +280,50 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+
+@bot.on_message(filters.command("terminate") & filters.user(SUDOERS + [OWNER_ID]))
+async def terminate_user(client, message: Message):
+    user = None
+    user_id = None
+    name = None
+
+    if message.reply_to_message:
+        user = message.reply_to_message.from_user
+        user_id = user.id
+        name = user.first_name
+    elif len(message.command) >= 2:
+        identifier = message.command[1]
+        if identifier.startswith("@"):
+            try:
+                user = await client.get_users(identifier)
+                user_id = user.id
+                name = user.first_name
+            except:
+                await message.reply_text("User not found.")
+                return
+        else:
+            try:
+                user_id = int(identifier)
+                user = await client.get_users(user_id)
+                name = user.first_name
+            except:
+                await message.reply_text("Invalid user ID.")
+                return
+    else:
+        await message.reply_text("Reply to a user or provide their ID/username.\nUsage: `/terminate <user_id or @username>`", parse_mode="markdown")
+        return
+
+    bot_entry = cloned_bots_collection.find_one({"user_id": user_id})
+    if not bot_entry:
+        await message.reply_text(f"{name} ({user_id}) is not part of any active UB.")
+        return
+
+    cloned_bots_collection.delete_one({"user_id": user_id})
+
+    try:
+        await client.send_message(user_id, "You have been terminated from the service.")
+    except:
+        pass
+
+    await message.reply_text(f"✅ {name} ({user_id}) has been terminated from UB.")
