@@ -564,10 +564,10 @@ async def all_clients_info(client, message: Message):
     total_clients = len(active_clients)
 
     if total_clients == 0:
-        await message.reply_text("No active clients at the moment.")
+        await message.reply_text("ɴᴏ ᴀᴄᴛɪᴠᴇ ᴄʟɪᴇɴᴛ ꜰᴏᴜɴᴅ.")
         return
 
-    lines = [f"**Total Active Clients: {total_clients}**\n"]
+    lines = [f"ᴛᴏᴛᴀʟ ᴀᴄᴛɪᴠᴇ ᴄʟɪᴇɴᴛ: {total_clients}\n"]
 
     for idx, client_data in enumerate(active_clients, 1):
         user_id = client_data["user_id"]
@@ -584,12 +584,12 @@ async def all_clients_info(client, message: Message):
             remaining = expire_at - datetime.utcnow()
             days = remaining.days
             hours = remaining.seconds // 3600
-            time_left = f"{days} days, {hours} hours left"
+            time_left = f"{days} ᴅᴀʏꜱ, {hours} ʜᴏᴜʀꜱ ʟᴇꜰᴛ"
         else:
             time_left = "Unknown duration"
 
         cloned_bot = cloned_bots_collection.find_one({"user_id": user_id})
-        status = "online" if cloned_bot else "offline"
+        status = "ᴀᴄᴛɪᴠᴇ" if cloned_bot else "ɪɴᴀᴄᴛɪᴠᴇ"
 
         lines.append(f"{idx}) {name}\n{user_id}\n{time_left}\n{status}\n\n")
 
