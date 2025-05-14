@@ -350,6 +350,13 @@ async def handle_approval_decision(client, query: CallbackQuery):
             }
         })
         await client.send_message(user_id, "Payment approved! You may now send /clone <your_string> to proceed.")
+        
+        await client.send_message(pyrecordcn, f"#NewPaymentCR\n\n"
+                                              f"Name: {query.from_user.first_name}\n"
+                                              f"User ID: {user_id}\n"
+                                              f"Duration: {user_data['days']} days\n"
+                                              f"Plan: ₹{user_data['amount']}")
+        
         log_text = (
             f"Cloning Approved\n"
             f"Approved By: {approver_info}\n"
@@ -360,6 +367,40 @@ async def handle_approval_decision(client, query: CallbackQuery):
         log_msg = await client.send_message(STORAGE_CHANNELID, log_text)
         payments_collection.update_one({"user_id": user_id}, {"$set": {"log_msg_id": log_msg.id}})
         await query.message.edit_text("✅ Payment approved.")
+        
+
+async def monthly_summary_task():
+    while True:
+        now = datetime.utcnow() + timedelta(hours=5, minutes=30)
+        last_day = calendar.monthrange(now.year, now.month)[1]
+        midnight = datetime(now.year, now.month, last_day, 23, 59, 59)
+        wait_seconds = (midnight - now).total_seconds()
+        await asyncio.sleep(max(wait_seconds, 0))
+
+        start = datetime(now.year, now.month, 1)
+        end = datetime(now.year, now.month, last_day, 23, 59, 59)
+
+        payments = payments_collection.find({
+            "status": "approved",
+            "approved_at": {"$gte": start, "$lte": end}
+        })
+
+        total = sum(p.get("amount", 0) for p in payments)
+        month_name = now.strftime("%B")
+
+        await bot.send_message(pyrecordcn,
+                               f"#MonthlySummary\n\n"
+                               f"Month: {month_name}\n"
+                               f"Period: 1st to {last_day}\n"
+                               f"Total Revenue: ₹{total}\n"
+                               f"Total Profit: ₹{total}")
+
+        await asyncio.sleep(90)
+
+
+async def main():
+    await bot.start()
+    asyncio.create_task(monthly_summary_task())
 
 # ------------------ Quit UserBot ------------------
 
