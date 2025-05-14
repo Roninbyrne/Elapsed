@@ -45,13 +45,17 @@ async def restart_bots():
         return
 
     bots = list(cloned_bots_collection.find())
-    for bot in bots:
+    for bot_data in bots:
+        user_id = bot_data["user_id"]
+        string = bot_data["string"]
+        user_name = bot_data.get("name", "Unknown")
+
         try:
             ai = Client(
-                name=f"restart-{bot['user_id']}",
+                name=f"restart-{user_id}",
                 api_id=API_ID,
                 api_hash=API_HASH,
-                session_string=bot['string'],
+                session_string=string,
                 plugins={"root": "Elapsed.plugins.userbot"},
             )
             await ai.start()
@@ -59,7 +63,25 @@ async def restart_bots():
             await ai.send_message("me", "UserBot restarted successfully.")
             await ai.stop()
         except Exception as e:
-            logging.exception(f"Failed to restart userbot for {bot['user_id']}: {e}")
+            logging.warning(f"Dead/invalid session for user {user_id}: {e}")
+            cloned_bots_collection.delete_one({"user_id": user_id})
+
+            for admin_id in HELPERS:
+                try:
+                    await bot.send_message(
+                        admin_id,
+                        f"⚠️ Dead session detected and removed.\nUser: {user_name}\nUser ID: {user_id}\nError: {str(e)}"
+                    )
+                except:
+                    pass
+
+            try:
+                await bot.send_message(
+                    user_id,
+                    "Your UserBot session appears to be removed or expired.\nPlease re-clone using `/clone <your_string>`."
+                )
+            except:
+                pass
 
 # ------------------ Stop All Client ------------------
 
