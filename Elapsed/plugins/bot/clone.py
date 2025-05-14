@@ -246,13 +246,26 @@ async def handle_approval_decision(client, query: CallbackQuery):
         await query.message.edit_text("✅ Payment approved.")
 
 
-@bot.on_message(filters.command("manageuser") & filters.user(HELPERS))
+@bot.on_message(filters.command("terminate") & filters.user(HELPERS))
 async def manage_user(client, message: Message):
-    if not message.reply_to_message:
-        await message.reply_text("Reply to the user you want to manage.")
+    args = message.text.split(maxsplit=2)
+    user = None
+    user_id = None
+    name = None
+
+    if message.reply_to_message:
+        user = message.reply_to_message.from_user
+    elif len(args) == 3 and args[2].isdigit():
+        try:
+            user_id = int(args[2])
+            user = await client.get_users(user_id)
+        except:
+            await message.reply_text("Invalid user ID or user not found.")
+            return
+    else:
+        await message.reply_text("Reply to a user or use /terminate username user_id.")
         return
 
-    user = message.reply_to_message.from_user
     user_id = user.id
     name = user.first_name
 
@@ -272,7 +285,7 @@ async def manage_user(client, message: Message):
         ])
     else:
         buttons.append([InlineKeyboardButton("Terminate Subscription", callback_data=f"terminate_sub_{user_id}")])
-    
+
     buttons.append([InlineKeyboardButton("Cancel", callback_data="cancel_manage")])
 
     markup = InlineKeyboardMarkup(buttons)
@@ -280,6 +293,7 @@ async def manage_user(client, message: Message):
         f"What do you want to do with {name} ({user_id})?",
         reply_markup=markup
     )
+
 
 @bot.on_callback_query()
 async def handle_callbacks(client, callback_query: CallbackQuery):
@@ -289,14 +303,23 @@ async def handle_callbacks(client, callback_query: CallbackQuery):
         return await callback_query.answer("You are not authorized to use this.", show_alert=True)
 
     data = callback_query.data
+    target_id = int(data.split("_")[-1])
+    try:
+        target_user = await client.get_users(target_id)
+        name = target_user.first_name
+    except:
+        name = "Unknown"
 
     if data.startswith("terminate_ub_"):
-        target_id = int(data.split("_")[-1])
         cloned_bots_collection.delete_one({"user_id": target_id})
-        await callback_query.edit_message_text(f"Cloned session for {target_id} terminated.")
+        await callback_query.answer(f"Cloned session for {name} ({target_id}) terminated.", show_alert=True)
+        await callback_query.edit_message_text(f"Cloned session for {name} ({target_id}) terminated.")
+        try:
+            await client.send_message(target_id, "Your cloned session has been terminated by the admin.")
+        except:
+            pass
 
     elif data.startswith("terminate_sub_"):
-        target_id = int(data.split("_")[-1])
         sub = payments_collection.find_one({"user_id": target_id})
         if sub and "log_msg_id" in sub:
             try:
@@ -304,10 +327,14 @@ async def handle_callbacks(client, callback_query: CallbackQuery):
             except:
                 pass
         payments_collection.delete_one({"user_id": target_id})
-        await callback_query.edit_message_text(f"Subscription for {target_id} terminated.")
+        await callback_query.answer(f"Subscription for {name} ({target_id}) terminated.", show_alert=True)
+        await callback_query.edit_message_text(f"Subscription for {name} ({target_id}) terminated.")
+        try:
+            await client.send_message(target_id, "Your subscription has been terminated by the admin.")
+        except:
+            pass
 
     elif data.startswith("terminate_all_"):
-        target_id = int(data.split("_")[-1])
         cloned_bots_collection.delete_one({"user_id": target_id})
         sub = payments_collection.find_one({"user_id": target_id})
         if sub and "log_msg_id" in sub:
@@ -316,9 +343,15 @@ async def handle_callbacks(client, callback_query: CallbackQuery):
             except:
                 pass
         payments_collection.delete_one({"user_id": target_id})
-        await callback_query.edit_message_text(f"All data for {target_id} has been terminated.")
+        await callback_query.answer(f"All data for {name} ({target_id}) has been terminated.", show_alert=True)
+        await callback_query.edit_message_text(f"All data for {name} ({target_id}) has been terminated.")
+        try:
+            await client.send_message(target_id, "All your data including subscription and sessions have been terminated by the admin.")
+        except:
+            pass
 
     elif data == "cancel_manage":
+        await callback_query.answer("Operation cancelled.", show_alert=True)
         await callback_query.edit_message_text("Operation cancelled.")
 
 async def check_expired_access():
