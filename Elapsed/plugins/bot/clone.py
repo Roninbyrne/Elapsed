@@ -12,6 +12,7 @@ from config import (
     API_HASH,
     MONGO_DB_URI,
     OWNER_ID,
+    HELPERS,
     JOIN_CHAT,
     SUPPORT_CHATID,
     STORAGE_CHANNELID,
@@ -19,7 +20,6 @@ from config import (
 )
 
 from Elapsed import app as bot
-from Elapsed.misc import SUDOERS
 
 logging.basicConfig(level=logging.INFO)
 
@@ -182,7 +182,7 @@ async def handle_payment_screenshot(client, message: Message):
         f"Duration: {duration_data['days']} days"
     )
 
-    for admin_id in list(set(SUDOERS + [OWNER_ID])):
+    for admin_id in HELPERS:
         try:
             await client.send_photo(admin_id, message.photo.file_id, caption=text)
         except Exception as e:
@@ -206,7 +206,7 @@ async def handle_approval_decision(client, query: CallbackQuery):
         await query.answer("Invalid action.")
         return
 
-    if query.from_user.id not in SUDOERS and query.from_user.id != OWNER_ID:
+    if query.from_user.id not in HELPERS:
         await query.answer("You're not authorized to perform this action.", show_alert=True)
         return
 
@@ -246,7 +246,7 @@ async def handle_approval_decision(client, query: CallbackQuery):
         await query.message.edit_text("✅ Payment approved.")
 
 
-@bot.on_message(filters.command("terminate") & filters.user(SUDOERS + [OWNER_ID]))
+@bot.on_message(filters.command("terminate") & filters.user(HELPERS))
 async def terminate_user(client, message: Message):
     user = None
     user_id = None
@@ -258,7 +258,7 @@ async def terminate_user(client, message: Message):
         name = user.first_name
     elif len(message.command) >= 2:
         identifier = message.command[1]
-        if identifier.startswith("@"):
+        if identifier.startswith("@"):            
             try:
                 user = await client.get_users(identifier)
                 user_id = user.id
