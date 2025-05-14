@@ -451,10 +451,10 @@ async def manage_user(client, message: Message):
             user_id = int(args[2])
             user = await client.get_users(user_id)
         except:
-            await message.reply_text("Invalid user ID or user not found.")
+            await message.reply_text("ɪɴᴠᴀʟɪᴅ ᴜꜱᴇʀ ɪᴅ ᴏʀ ᴜꜱᴇʀ ɴᴏᴛ ꜰᴏᴜɴᴅ.")
             return
     else:
-        await message.reply_text("Reply to a user or use /terminate username user_id.")
+        await message.reply_text("ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴜꜱᴇʀ ᴏʀ ᴜꜱᴇ /ᴛᴇʀᴍɪɴᴀᴛᴇ ᴜꜱᴇʀɴᴀᴍᴇ/ᴜꜱᴇʀɪᴅ.")
         return
 
     user_id = user.id
@@ -462,7 +462,7 @@ async def manage_user(client, message: Message):
 
     subscription = payments_collection.find_one({"user_id": user_id, "status": "approved"})
     if not subscription:
-        await message.reply_text(f"{name} ({user_id}) does not have an active subscription.")
+        await message.reply_text(f"{name} ({user_id}) ᴅᴏᴇꜱ ɴᴏᴛ ʜᴀᴠᴇ ᴀɴ ᴀᴄᴛɪᴠᴇ ꜱᴜʙꜱᴄʀɪᴘᴛɪᴏɴ.")
         return
 
     cloned = cloned_bots_collection.find_one({"user_id": user_id})
@@ -470,18 +470,18 @@ async def manage_user(client, message: Message):
     buttons = []
     if cloned:
         buttons.extend([
-            [InlineKeyboardButton("Terminate Sessions", callback_data=f"terminate_ub_{user_id}")],
-            [InlineKeyboardButton("Terminate Subscription", callback_data=f"terminate_sub_{user_id}")],
-            [InlineKeyboardButton("Terminate All", callback_data=f"terminate_all_{user_id}")]
+            [InlineKeyboardButton("ᴛᴇʀᴍɪɴᴀᴛᴇ ꜱᴇꜱꜱɪᴏɴ", callback_data=f"terminate_ub_{user_id}")],
+            [InlineKeyboardButton("ᴛᴇʀᴍɪɴᴀᴛᴇ ꜱᴜʙꜱᴄʀɪᴘᴛɪᴏɴ", callback_data=f"terminate_sub_{user_id}")],
+            [InlineKeyboardButton("ᴛᴇʀᴍɪɴᴀᴛᴇ ᴀʟʟ ☢️", callback_data=f"terminate_all_{user_id}")]
         ])
     else:
-        buttons.append([InlineKeyboardButton("Terminate Subscription", callback_data=f"terminate_sub_{user_id}")])
+        buttons.append([InlineKeyboardButton("ᴛᴇʀᴍɪɴᴀᴛᴇ ꜱᴜʙꜱᴄʀɪᴘᴛɪᴏɴ", callback_data=f"terminate_sub_{user_id}")])
 
-    buttons.append([InlineKeyboardButton("Cancel", callback_data="cancel_manage")])
+    buttons.append([InlineKeyboardButton("ᴄᴀɴᴄᴇʟ ", callback_data="cancel_manage")])
 
     markup = InlineKeyboardMarkup(buttons)
     await message.reply_text(
-        f"What do you want to do with {name} ({user_id})?",
+        f"⚠️ ꜰᴏʀꜱʙɪᴛᴇ ᴅᴇᴄɪꜱᴏɴ  {name} ({user_id})?",
         reply_markup=markup
     )
 
@@ -506,7 +506,7 @@ async def handle_callbacks(client, callback_query: CallbackQuery):
         await callback_query.answer(f"Cloned session for {name} ({target_id}) terminated.", show_alert=True)
         await callback_query.edit_message_text(f"Cloned session for {name} ({target_id}) terminated.")
         try:
-            await client.send_message(target_id, "Your cloned session has been terminated by the admin.")
+            await client.send_message(target_id, "⚠️ ʏᴏᴜʀ ᴄʟᴏɴᴇᴅ ꜱᴇꜱꜱɪᴏɴ ʜᴀꜱ ʙᴇᴇɴ ᴛᴇʀᴍɪɴᴀᴛᴇᴅ ʙʏ ᴛʜᴇ ᴍᴏᴅᴇʀᴀᴛᴏʀ, ᴄᴏɴᴛᴀᴄᴛ ᴛʜᴇᴍ")
         except:
             pass
 
@@ -518,10 +518,10 @@ async def handle_callbacks(client, callback_query: CallbackQuery):
             except:
                 pass
         payments_collection.delete_one({"user_id": target_id})
-        await callback_query.answer(f"Subscription for {name} ({target_id}) terminated.", show_alert=True)
-        await callback_query.edit_message_text(f"Subscription for {name} ({target_id}) terminated.")
+        await callback_query.answer(f"ꜱᴜʙꜱᴄʀɪᴘᴛɪᴏɴ ꜰᴏʀ {name} ({target_id}) ᴛᴇʀᴍɪɴᴀᴛᴇᴅ.", show_alert=True)
+        await callback_query.edit_message_text(f"ꜱᴜʙꜱᴄʀɪᴘᴛɪᴏɴ ꜰᴏʀ {name} ({target_id}) ᴛᴇʀᴍɪɴᴀᴛᴇᴅ .")
         try:
-            await client.send_message(target_id, "Your subscription has been terminated by the admin.")
+            await client.send_message(target_id, "💢 ʏᴏᴜʀ ꜱᴜʙꜱᴄʀɪᴘᴛɪᴏɴ ʜᴀꜱ ʙᴇᴇɴ ᴛᴇʀᴍɪɴᴀᴛᴇᴅ ʙʏ ᴛʜᴇ ᴍᴏᴅᴇʀᴀᴛᴏʀꜱ ᴄʟᴏɴᴇ ᴀɢᴀɪɴ.")
         except:
             pass
 
@@ -538,23 +538,23 @@ async def handle_callbacks(client, callback_query: CallbackQuery):
         if sub and "clone_log_id" in sub:
             try:
                 original_msg = await bot.get_messages(STORAGE_CHANNELID, sub["clone_log_id"])
-                terminated_by = f"\nTerminated by: {callback_query.from_user.first_name} (@{callback_query.from_user.username or 'N/A'})"
+                terminated_by = f"\nᴛᴇʀᴍɪɴᴀᴛᴇᴅ ʙʏ: {callback_query.from_user.first_name} (@{callback_query.from_user.username or 'N/A'})"
                 updated_text = original_msg.text + terminated_by
                 await bot.edit_message_text(STORAGE_CHANNELID, sub["clone_log_id"], updated_text)
             except:
                 pass
 
         payments_collection.delete_one({"user_id": target_id})
-        await callback_query.answer(f"All data for {name} ({target_id}) has been terminated.", show_alert=True)
-        await callback_query.edit_message_text(f"All data for {name} ({target_id}) has been terminated.")
+        await callback_query.answer(f"ᴀʟʟ ᴅᴀᴛᴀ ꜰᴏʀ {name} ({target_id}) ʜᴀꜱ ʙᴇᴇɴ ᴛᴇʀᴍɪɴᴀᴛᴇᴅ.", show_alert=True)
+        await callback_query.edit_message_text(f"ᴀʟʟ ᴅᴀᴛᴀ ꜰᴏʀ {name} ({target_id}) ʜᴀꜱ ʙᴇᴇɴ ᴛᴇʀᴍɪɴᴀᴛᴇᴅ.")
         try:
-            await client.send_message(target_id, "All your data including subscription and sessions have been terminated by the admin.")
+            await client.send_message(target_id, "⚠️ ᴀʟʟ ʏᴏᴜʀ ᴅᴀᴛᴀ ɪɴᴄʟᴜᴅɪɴɢ ꜱᴜʙꜱᴄʀɪᴘᴛɪᴏɴ ᴀɴᴅ ꜱᴇꜱꜱɪᴏɴꜱ ʜᴀᴠᴇ ʙᴇᴇɴ ᴛᴇʀᴍɪɴᴀᴛᴇᴅ ʙʏ ᴛʜᴇ ᴍᴏᴅᴇʀᴀᴛᴏʀ, ᴄᴏɴᴛᴀᴄᴛ ɪᴍᴍɪᴅᴇᴛᴀʟʏ.")
         except:
             pass
 
     elif data == "cancel_manage":
         await callback_query.answer("Operation cancelled.", show_alert=True)
-        await callback_query.edit_message_text("Operation cancelled.")
+        await callback_query.edit_message_text("ᴏᴘᴇʀᴀᴛɪᴏɴ ᴄᴀɴᴄᴇʟʟᴇᴅ.")
 
 # ------------------ All Client Info ------------------
 
