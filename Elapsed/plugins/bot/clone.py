@@ -365,6 +365,41 @@ async def handle_callbacks(client, callback_query: CallbackQuery):
         await callback_query.answer("Operation cancelled.", show_alert=True)
         await callback_query.edit_message_text("Operation cancelled.")
 
+@bot.on_message(filters.command("allclient") & filters.user(HELPERS))
+async def all_clients_info(client, message: Message):
+    active_clients = list(payments_collection.find({"status": "approved"}))
+    total_clients = len(active_clients)
+
+    if total_clients == 0:
+        await message.reply_text("No active clients at the moment.")
+        return
+
+    lines = [f"**Total Active Clients: {total_clients}**\n"]
+
+    for idx, client_data in enumerate(active_clients, 1):
+        user_id = client_data["user_id"]
+        expire_at = client_data.get("expire_at")
+        name = "Unknown"
+
+        try:
+            user = await client.get_users(user_id)
+            name = user.first_name
+        except:
+            pass
+
+        if expire_at:
+            remaining = expire_at - datetime.utcnow()
+            days = remaining.days
+            hours = remaining.seconds // 3600
+            time_left = f"{days} days, {hours} hours left"
+        else:
+            time_left = "Unknown duration"
+
+        lines.append(f"**{idx}) {name}** (`{user_id}`)\n`{time_left}`\n")
+
+    output = "\n".join(lines)
+    await message.reply_text(output, disable_web_page_preview=True)
+
 async def check_expired_access():
     while True:
         now = datetime.utcnow()
