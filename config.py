@@ -12,6 +12,8 @@ BOT_TOKEN = "8118270568:AAFszaCQOqFRouEnmLDG5x_ooxnhpcB3E98"
 JOIN_CHAT = "ProjectElapsed"
 MONGO_DB_URI = "mongodb+srv://Yumi:Yumi@yumi.inctk.mongodb.net/?retryWrites=true&w=majority&appName=Yumi"
 
+pyrecordcn = -1002619717548
+
 DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 60))
 
 LOGGER_ID = -1002059639505
