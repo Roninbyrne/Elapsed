@@ -183,6 +183,15 @@ async def start_clone_flow(client, message: Message):
             await message.reply_text("ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴀᴘᴘʀᴏᴠᴇᴅ ʏᴇᴛ. ᴘʟᴇᴀꜱᴇ ᴘᴀʏ ᴀɴᴅ ᴡᴀɪᴛ ꜰᴏʀ ᴀᴘᴘʀᴏᴠᴀʟ ʙᴇꜰᴏʀᴇ ᴄʟᴏɴɪɴɢ.")
             return
 
+        existing_clone = cloned_bots_collection.find_one({"user_id": user_id})
+        if existing_clone:
+            await message.reply_text(
+                "ʏᴏᴜ ʜᴀᴠᴇ ᴀʟʀᴇᴀᴅʏ ᴄʟᴏɴᴇᴅ ᴀɴ ᴀᴄᴄᴏᴜɴᴛ.\n"
+                "ᴏɴʟʏ ᴏɴᴇ ᴄʟᴏɴᴇ ᴀʟʟᴏᴡᴇᴅ ᴘᴇʀ ᴜꜱᴇʀ.\n"
+                "ᴜꜱᴇ /startub ɪꜰ ʏᴏᴜ ɴᴇᴇᴅ ᴛᴏ ꜱᴛᴀʀᴛ ʏᴏᴜʀ ᴄʟᴏɴᴇᴅ ᴜʙ."
+            )
+            return
+
         bots = list(cloned_bots_collection.find())
         for bot_entry in bots:
             if bot_entry['string'] == string_token:
