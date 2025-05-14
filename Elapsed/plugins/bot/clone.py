@@ -188,14 +188,12 @@ async def handle_payment_screenshot(client, message: Message):
         f"Duration: {duration_data['days']} days"
     )
 
-    # Send screenshot to SUDOERS and OWNER_ID via DM (no buttons)
     for admin_id in list(set(SUDOERS + [OWNER_ID])):
         try:
             await client.send_photo(admin_id, message.photo.file_id, caption=text)
         except Exception as e:
             logging.warning(f"Couldn't send screenshot to {admin_id}: {e}")
 
-    # Send to SUPPORT_CHATID with approval buttons
     support_text = text + "\n\nApprove or decline the payment:"
     keyboard = InlineKeyboardMarkup([
         [
@@ -214,7 +212,6 @@ async def handle_approval_decision(client, query: CallbackQuery):
         await query.answer("Invalid action.")
         return
 
-    # Authorization check
     if query.from_user.id not in SUDOERS and query.from_user.id != OWNER_ID:
         await query.answer("You're not authorized to perform this action.", show_alert=True)
         return
