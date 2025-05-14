@@ -588,7 +588,10 @@ async def all_clients_info(client, message: Message):
         else:
             time_left = "Unknown duration"
 
-        lines.append(f"**{idx}) {name}** (`{user_id}`)\n`{time_left}`\n")
+        cloned_bot = cloned_bots_collection.find_one({"user_id": user_id})
+        status = "online" if cloned_bot else "offline"
+
+        lines.append(f"**{idx}) {name}** (`{user_id}`)\n{time_left} ({status})\n")
 
     output = "\n".join(lines)
     await message.reply_text(output, disable_web_page_preview=True)
