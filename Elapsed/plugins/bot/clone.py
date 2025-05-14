@@ -266,7 +266,7 @@ async def handle_payment_selection(client, query: CallbackQuery):
     await query.message.delete()
     await query.message.reply_photo(
         QR_IMAGE_URL,
-        caption=f"Send the screenshot of your ₹{duration_data['amount']} payment here within 3 minutes."
+        caption=f"ꜱᴇɴᴅ ᴛʜᴇ ꜱᴄʀᴇᴇɴꜱʜᴏᴛ ᴏꜰ ʏᴏᴜʀ ₹{duration_data['amount']} ᴘᴀʏᴍᴇɴᴛ ʜᴇʀᴇ ᴡɪᴛʜɪɴ 3 ᴍɪɴᴜᴛᴇꜱ."
     )
 
     await asyncio.sleep(180)
@@ -274,7 +274,7 @@ async def handle_payment_selection(client, query: CallbackQuery):
     if pending:
         payments_collection.delete_one({"user_id": user_id})
         try:
-            await client.send_message(user_id, "Time expired. Please start again using /clone.")
+            await client.send_message(user_id, "ᴛɪᴍᴇ ᴇxᴘɪʀᴇᴅ, ᴘʟᴇᴀꜱᴇ ꜱᴛᴀʀᴛ ᴀɢᴀɪɴ ᴜꜱɪɴɢ /clone..")
         except:
             pass
 
@@ -284,7 +284,7 @@ async def handle_payment_screenshot(client, message: Message):
     user_id = message.from_user.id
     pending = payments_collection.find_one({"user_id": user_id, "status": "pending"})
     if not pending:
-        await message.reply_text("No pending payment found. Start with /clone.")
+        await message.reply_text("ɴᴏ ᴘᴇɴᴅɪɴɢ ᴘᴀʏᴍᴇɴᴛ ꜰᴏᴜɴᴅ. ꜱᴛᴀʀᴛ ᴡɪᴛʜ /clone.")
         return
 
     payments_collection.update_one({"user_id": user_id}, {"$set": {"status": "verifying"}})
@@ -292,11 +292,11 @@ async def handle_payment_screenshot(client, message: Message):
     user = message.from_user
     duration_data = DURATIONS[pending["duration_key"]]
     text = (
-        f"Name: {user.first_name}\n"
-        f"User ID: {user.id}\n"
-        f"Username: @{user.username or 'N/A'}\n"
-        f"DC ID: {user.dc_id}\n"
-        f"Duration: {duration_data['days']} days"
+        f"ɴᴀᴍᴇ: {user.first_name}\n"
+        f"ᴜꜱᴇʀ ɪᴅ : {user.id}\n"
+        f"ᴜꜱᴇʀɴᴀᴍᴇ : @{user.username or 'N/A'}\n"
+        f":ᴅᴄ ɪᴅ {user.dc_id}\n"
+        f":ᴅᴜʀᴀᴛɪᴏɴ  {duration_data['days']} ᴅᴀʏꜱ"
     )
 
     for admin_id in HELPERS:
@@ -305,15 +305,15 @@ async def handle_payment_screenshot(client, message: Message):
         except Exception as e:
             logging.warning(f"Couldn't send screenshot to {admin_id}: {e}")
 
-    support_text = text + "\n\nApprove or decline the payment:"
+    support_text = text + "\n\nᴍᴏᴅᴇʀᴀᴛᴏʀꜱ ᴀᴜᴛʜᴏʀɪꜱᴇ ᴏɴʟʏ :"
     keyboard = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("✅ Approve", callback_data=f"approve{user_id}"),
-            InlineKeyboardButton("❌ Decline", callback_data=f"decline{user_id}")
+            InlineKeyboardButton("ᴀᴘᴘʀᴏᴠᴇ ", callback_data=f"approve{user_id}"),
+            InlineKeyboardButton("ᴅᴇᴄʟɪɴᴇ ", callback_data=f"decline{user_id}")
         ]
     ])
     await client.send_message(SUPPORT_CHATID, support_text, reply_markup=keyboard)
-    await message.reply_text("Your screenshot has been submitted. Please wait for verification.")
+    await message.reply_text("ʏᴏᴜʀ ꜱᴄʀᴇᴇɴꜱʜᴏᴛ ʜᴀꜱ ʙᴇᴇɴ ꜱᴜʙᴍɪᴛᴛᴇᴅ. ᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ ꜰᴏʀ ᴠᴇʀɪꜰɪᴄᴀᴛɪᴏɴ.")
 
 
 @bot.on_callback_query(filters.regex(r"(approve|decline)\d+"))
