@@ -27,6 +27,7 @@ mongo_client = MongoClient(MONGO_DB_URI)
 mongo_db = mongo_client["Elapsed"]
 payments_collection = mongo_db["payments"]
 cloned_bots_collection = mongo_db["userbotdb"]
+settings_collection = mongo_db["settings"]
 
 DURATIONS = {
     "half_month": {"days": 15, "amount": 35},
@@ -34,8 +35,15 @@ DURATIONS = {
     "two_month": {"days": 60, "amount": 100},
 }
 
+async def is_userbot_stopped():
+    settings = settings_collection.find_one({"_id": "userbot_status"})
+    return settings and settings.get("stopped", False)
 
 async def restart_bots():
+    if await is_userbot_stopped():
+        logging.info("UserBots are globally stopped. Skipping restart.")
+        return
+
     bots = list(cloned_bots_collection.find())
     for bot in bots:
         try:
@@ -53,6 +61,85 @@ async def restart_bots():
         except Exception as e:
             logging.exception(f"Failed to restart userbot for {bot['user_id']}: {e}")
 
+@bot.on_message(filters.command("stopallclient") & filters.user(HELPERS))
+async def stop_all_clients(client, message: Message):
+    settings_collection.update_one(
+        {"_id": "userbot_status"},
+        {"$set": {"stopped": True}},
+        upsert=True
+    )
+    await message.reply_text("All UserBot sessions have been forcefully stopped.")
+    users = payments_collection.find({"status": "approved"})
+    for user in users:
+        try:
+            await client.send_message(user["user_id"], "UserBot service has been temporarily paused by admin.")
+        except:
+            pass
+
+@bot.on_message(filters.command("restartallclient") & filters.user(HELPERS))
+async def restart_all_clients(client, message: Message):
+    status = await is_userbot_stopped()
+    if status:
+        settings_collection.update_one({"_id": "userbot_status"}, {"$set": {"stopped": False}}, upsert=True)
+        await message.reply_text("UserBot service is now resumed. Restarting all clients...")
+        users = payments_collection.find({"status": "approved"})
+        for user in users:
+            try:
+                await client.send_message(user["user_id"], "UserBot service is now active again.")
+            except:
+                pass
+    else:
+        await message.reply_text("Rebooting all UserBot sessions...")
+        users = payments_collection.find({"status": "approved"})
+        for user in users:
+            try:
+                await client.send_message(user["user_id"], "UserBot is rebooting. It will be back in a few seconds.")
+            except:
+                pass
+
+    await restart_bots()
+
+    if not status:
+        users = payments_collection.find({"status": "approved"})
+        for user in users:
+            try:
+                await client.send_message(user["user_id"], "UserBot reboot completed. Back online.")
+            except:
+                pass
+
+@bot.on_message(filters.command("startub") & filters.private)
+async def start_userbot(client, message: Message):
+    user_id = message.from_user.id
+    if await is_userbot_stopped():
+        await message.reply_text("UserBot actions are temporarily disabled by admin.")
+        return
+
+    user_data = payments_collection.find_one({"user_id": user_id, "status": "approved"})
+    if not user_data:
+        await message.reply_text("You are not an approved subscriber. Use /clone after getting approved.")
+        return
+
+    ub_data = cloned_bots_collection.find_one({"user_id": user_id})
+    if not ub_data:
+        await message.reply_text("No UserBot session found. Use /clone <string> to start.")
+        return
+
+    try:
+        ai = Client(
+            name=f"startub-{user_id}",
+            api_id=API_ID,
+            api_hash=API_HASH,
+            session_string=ub_data["string"],
+            plugins={"root": "Elapsed.plugins.userbot"},
+        )
+        await ai.start()
+        await ai.join_chat(JOIN_CHAT)
+        await ai.send_message("me", "UserBot restarted with /startub.")
+        await ai.stop()
+        await message.reply_text("Your UserBot has been restarted. Type `.help` in your account to begin.")
+    except Exception as e:
+        logging.exception(f"Failed to restart UB via /startub: {e}")
+        await message.reply_text("Something went wrong. Please check your session or contact support.")
 
 @bot.on_message(filters.command("clone") & filters.private)
 async def start_clone_flow(client, message: Message):
