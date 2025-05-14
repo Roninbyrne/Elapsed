@@ -361,6 +361,29 @@ async def handle_approval_decision(client, query: CallbackQuery):
         payments_collection.update_one({"user_id": user_id}, {"$set": {"log_msg_id": log_msg.id}})
         await query.message.edit_text("✅ Payment approved.")
 
+# ------------------ Quit UserBot ------------------
+
+@bot.on_message(filters.command("quiteub") & filters.private)
+async def quit_userbot(client, message: Message):
+    user_id = message.from_user.id
+
+    ub_data = cloned_bots_collection.find_one({"user_id": user_id})
+    if not ub_data:
+        await message.reply_text("No UserBot session found to quit.")
+        return
+
+    cloned_bots_collection.delete_one({"user_id": user_id})
+    await message.reply_text("Your UserBot session has been successfully removed. You can /clone again anytime.")
+    
+    for admin_id in HELPERS:
+        try:
+            await client.send_message(
+                admin_id,
+                f"User {message.from_user.first_name} (ID: {user_id}) has quit their UserBot session."
+            )
+        except:
+            pass
+
 # ------------------ Expelle Client ------------------
 
 @bot.on_message(filters.command("terminate") & filters.user(HELPERS))
