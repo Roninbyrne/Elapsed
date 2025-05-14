@@ -4,15 +4,8 @@ import logging
 from datetime import datetime, timedelta
 
 from pymongo import MongoClient
-from Elapsed.misc import SUDOERS
-
 from pyrogram import Client, filters, idle
-from pyrogram.types import (
-    Message,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    CallbackQuery
-)
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
 from config import (
     API_ID,
@@ -26,6 +19,7 @@ from config import (
 )
 
 from Elapsed import app as bot
+from Elapsed.misc import SUDOERS
 
 logging.basicConfig(level=logging.INFO)
 
@@ -106,7 +100,7 @@ async def start_clone_flow(client, message: Message):
                 f"User Cloned UB:\n"
                 f"Name: {bot_user.first_name}\n"
                 f"User ID: {user_id}\n"
-                f"Username: @{bot_user.username if bot_user.username else 'N/A'}\n"
+                f"Username: @{bot_user.username or 'N/A'}\n"
                 f"DC ID: {message.from_user.dc_id}\n"
                 f"Approved By: {approver_info}\n"
                 f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (IST)"
@@ -183,7 +177,7 @@ async def handle_payment_screenshot(client, message: Message):
     text = (
         f"Name: {user.first_name}\n"
         f"User ID: {user.id}\n"
-        f"Username: @{user.username if user.username else 'N/A'}\n"
+        f"Username: @{user.username or 'N/A'}\n"
         f"DC ID: {user.dc_id}\n"
         f"Duration: {duration_data['days']} days"
     )
@@ -239,9 +233,7 @@ async def handle_approval_decision(client, query: CallbackQuery):
                 "approver": approver_info
             }
         })
-
         await client.send_message(user_id, "Payment approved! You may now send /clone <your_string> to proceed.")
-
         log_text = (
             f"Cloning Approved\n"
             f"Approved By: {approver_info}\n"
@@ -252,31 +244,6 @@ async def handle_approval_decision(client, query: CallbackQuery):
         log_msg = await client.send_message(STORAGE_CHANNELID, log_text)
         payments_collection.update_one({"user_id": user_id}, {"$set": {"log_msg_id": log_msg.id}})
         await query.message.edit_text("✅ Payment approved.")
-
-
-async def check_expired_access():
-    while True:
-        now = datetime.utcnow()
-        expired = payments_collection.find({"status": "approved", "expire_at": {"$lte": now}})
-        for user in expired:
-            try:
-                if "log_msg_id" in user:
-                    await bot.delete_messages(STORAGE_CHANNELID, message_ids=[user["log_msg_id"]])
-            except:
-                pass
-            payments_collection.delete_one({"user_id": user["user_id"]})
-        await asyncio.sleep(3600)
-
-
-async def main():
-    await bot.start()
-    asyncio.create_task(check_expired_access())
-    print("Bot is running...")
-    await idle()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
 
 
 @bot.on_message(filters.command("terminate") & filters.user(SUDOERS + [OWNER_ID]))
@@ -317,10 +284,34 @@ async def terminate_user(client, message: Message):
         return
 
     cloned_bots_collection.delete_one({"user_id": user_id})
-
     try:
         await client.send_message(user_id, "You have been terminated from the service.")
     except:
         pass
 
     await message.reply_text(f"✅ {name} ({user_id}) has been terminated from UB.")
+
+
+async def check_expired_access():
+    while True:
+        now = datetime.utcnow()
+        expired = payments_collection.find({"status": "approved", "expire_at": {"$lte": now}})
+        for user in expired:
+            try:
+                if "log_msg_id" in user:
+                    await bot.delete_messages(STORAGE_CHANNELID, message_ids=[user["log_msg_id"]])
+            except:
+                pass
+            payments_collection.delete_one({"user_id": user["user_id"]})
+        await asyncio.sleep(3600)
+
+
+async def main():
+    await bot.start()
+    asyncio.create_task(check_expired_access())
+    print("Bot is running...")
+    await idle()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
