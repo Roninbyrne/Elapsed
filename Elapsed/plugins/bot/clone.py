@@ -591,12 +591,12 @@ async def all_clients_info(client, message: Message):
         cloned_bot = cloned_bots_collection.find_one({"user_id": user_id})
         status = "online" if cloned_bot else "offline"
 
-        lines.append(f"{idx}) {name}\n{user_id}\n{time_left}\n{status}\n")
+        lines.append(f"{idx}) {name}\n{user_id}\n{time_left}\n{status}\n\n")
 
     output = "\n".join(lines)
     await message.reply_text(output, disable_web_page_preview=True)
 
-# ------------------ Main Code Script ------------------
+# ------------------ Core Code Script ------------------
 
 async def check_expired_access():
     while True:
