@@ -61,7 +61,9 @@ async def restart_bots():
         except Exception as e:
             logging.exception(f"Failed to restart userbot for {bot['user_id']}: {e}")
 
-@bot.on_message(filters.command("stopallclient") & filters.user(HELPERS))
+# ------------------ Stop All Client ------------------
+
+@bot.on_message(filters.command("stopallub") & filters.user(HELPERS))
 async def stop_all_clients(client, message: Message):
     settings_collection.update_one(
         {"_id": "userbot_status"},
@@ -75,8 +77,9 @@ async def stop_all_clients(client, message: Message):
             await client.send_message(user["user_id"], "UserBot service has been temporarily paused by admin.")
         except:
             pass
+# ------------------ Restart All Client ------------------
 
-@bot.on_message(filters.command("restartallclient") & filters.user(HELPERS))
+@bot.on_message(filters.command("rsallub") & filters.user(HELPERS))
 async def restart_all_clients(client, message: Message):
     status = await is_userbot_stopped()
     if status:
@@ -106,6 +109,8 @@ async def restart_all_clients(client, message: Message):
                 await client.send_message(user["user_id"], "UserBot reboot completed. Back online.")
             except:
                 pass
+
+# ------------------ Start Personal Client ------------------
 
 @bot.on_message(filters.command("startub") & filters.private)
 async def start_userbot(client, message: Message):
@@ -140,6 +145,8 @@ async def start_userbot(client, message: Message):
     except Exception as e:
         logging.exception(f"Failed to restart UB via /startub: {e}")
         await message.reply_text("Something went wrong. Please check your session or contact support.")
+
+# ------------------ Clone Client ------------------
 
 @bot.on_message(filters.command("clone") & filters.private)
 async def start_clone_flow(client, message: Message):
@@ -332,6 +339,7 @@ async def handle_approval_decision(client, query: CallbackQuery):
         payments_collection.update_one({"user_id": user_id}, {"$set": {"log_msg_id": log_msg.id}})
         await query.message.edit_text("✅ Payment approved.")
 
+# ------------------ Expelle Client ------------------
 
 @bot.on_message(filters.command("terminate") & filters.user(HELPERS))
 async def manage_user(client, message: Message):
@@ -452,6 +460,8 @@ async def handle_callbacks(client, callback_query: CallbackQuery):
         await callback_query.answer("Operation cancelled.", show_alert=True)
         await callback_query.edit_message_text("Operation cancelled.")
 
+# ------------------ All Client Info ------------------
+
 @bot.on_message(filters.command("allclient") & filters.user(HELPERS))
 async def all_clients_info(client, message: Message):
     active_clients = list(payments_collection.find({"status": "approved"}))
@@ -486,6 +496,8 @@ async def all_clients_info(client, message: Message):
 
     output = "\n".join(lines)
     await message.reply_text(output, disable_web_page_preview=True)
+
+# ------------------ Main Code Script ------------------
 
 async def check_expired_access():
     while True:
