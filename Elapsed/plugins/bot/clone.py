@@ -16,7 +16,8 @@ from config import (
     JOIN_CHAT,
     SUPPORT_CHATID,
     STORAGE_CHANNELID,
-    QR_IMAGE_URL
+    QR_IMAGE_URL,
+    pyrecordcn
 )
 
 from Elapsed import app as bot
