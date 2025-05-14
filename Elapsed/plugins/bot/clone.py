@@ -71,7 +71,7 @@ async def restart_bots():
                 try:
                     await bot.send_message(
                         admin_id,
-                        f"⚠️ Dead session detected and removed.\nUser: {user_name}\nUser ID: {user_id}\nError: {str(e)}"
+                        f"⚠️ ᴅᴇᴀᴅ ꜱᴇꜱꜱɪᴏɴ ᴅᴇᴛᴇᴄᴛᴇᴅ ᴀɴᴅ ʀᴇᴍᴏᴠᴇᴅ.\nᴜꜱᴇʀ: {user_name}\nUser ɪᴅ: {user_id}\nᴇʀʀᴏʀ: {str(e)}"
                     )
                 except:
                     pass
@@ -79,7 +79,7 @@ async def restart_bots():
             try:
                 await bot.send_message(
                     user_id,
-                    "Your UserBot session appears to be removed or expired.\nPlease re-clone using `/clone <your_string>`."
+                    "ʏᴏᴜʀ ᴜꜱᴇʀʙᴏᴛ ꜱᴇꜱꜱɪᴏɴ ᴀᴘᴘᴇᴀʀꜱ ᴛᴏ ʙᴇ ʀᴇᴍᴏᴠᴇᴅ ᴏʀ ᴇxᴘɪʀᴇᴅ..\nᴘʟᴇᴀꜱᴇ ʀᴇ - ᴄʟᴏɴᴇ ᴜꜱɪɴɢ /clone <your_string> ."
                 )
             except:
                 pass
