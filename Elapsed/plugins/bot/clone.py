@@ -337,8 +337,8 @@ async def handle_approval_decision(client, query: CallbackQuery):
 
     if action == "decline":
         payments_collection.delete_one({"user_id": user_id})
-        await client.send_message(user_id, "Your payment was declined. Contact support if needed.")
-        await query.message.edit_text("❌ Payment declined.")
+        await client.send_message(user_id, "ʏᴏᴜʀ ʀᴇQᴜᴇꜱᴛ ᴛᴏ ᴄʟᴏɴᴇ ʜᴀꜱ ʙᴇᴇɴ ᴅᴇᴄʟɪɴᴇᴅ, ᴄᴏɴᴛᴀᴄᴛ ꜱᴜᴘᴘᴏʀᴛ .")
+        await query.message.edit_text("ᴄʟᴏɴɪɴɢ ʀᴇQᴜᴇꜱᴛ ᴅᴇᴄʟɪɴᴇᴅ 💢.")
     else:
         expire_time = datetime.utcnow() + timedelta(days=user_data["days"])
         approver_info = f"{query.from_user.first_name} (@{query.from_user.username or 'N/A'})"
@@ -350,24 +350,24 @@ async def handle_approval_decision(client, query: CallbackQuery):
                 "approver": approver_info
             }
         })
-        await client.send_message(user_id, "Payment approved! You may now send /clone <your_string> to proceed.")
+        await client.send_message(user_id, "ᴄʟᴏɴɪɴɢ ʀᴇQᴜᴇꜱᴛ ᴀᴘᴘʀᴏᴠᴇᴅ, ʏᴏᴜ ᴍᴀʏ ɴᴏᴡ ꜱᴇɴᴅ /ᴄʟᴏɴᴇ <ʏᴏᴜʀ_ꜱᴛʀɪɴɢ> ᴛᴏ ᴘʀᴏᴄᴇᴇᴅ.")
         
         await client.send_message(pyrecordcn, f"#NewPaymentCR\n\n"
-                                              f"Name: {query.from_user.first_name}\n"
-                                              f"User ID: {user_id}\n"
-                                              f"Duration: {user_data['days']} days\n"
-                                              f"Plan: ₹{user_data['amount']}")
+                                              f"ɴᴀᴍᴇ: {query.from_user.first_name}\n"
+                                              f"ᴜꜱᴇʀ ɪᴅ: {user_id}\n"
+                                              f"ᴅᴜʀᴀᴛɪᴏɴ : {user_data['days']} ᴅᴀʏꜱ\n"
+                                              f"ᴘʟᴀɴ: ₹{user_data['amount']}")
         
         log_text = (
-            f"Cloning Approved\n"
-            f"Approved By: {approver_info}\n"
-            f"User ID: {user_id}\n"
-            f"Duration: {user_data['days']} days\n"
+            f"ᴄʟᴏɴɪɴɢ ᴀᴘᴘʀᴏᴠᴇᴅ \n"
+            f"ᴀᴘᴘʀᴏᴠᴇᴅ ʙʏ: {approver_info}\n"
+            f"ᴜꜱᴇʀ ɪᴅ: {user_id}\n"
+            f"ᴅᴜʀᴀᴛɪᴏɴ : {user_data['days']} ᴅᴀʏꜱ\n"
             f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (IST)"
         )
         log_msg = await client.send_message(STORAGE_CHANNELID, log_text)
         payments_collection.update_one({"user_id": user_id}, {"$set": {"log_msg_id": log_msg.id}})
-        await query.message.edit_text("✅ Payment approved.")
+        await query.message.edit_text("ᴄʟᴏɴɪɴɢ ʀᴇQᴜᴇꜱᴛ ᴀᴘᴘʀᴏᴠᴇᴅ.")
         
 
 async def monthly_summary_task():
