@@ -609,10 +609,10 @@ async def delete_cloned_bot(client, message):
             await message.reply_text("➢ ꜱᴇɴᴅ ᴛʜɪꜱ ᴄᴏᴍᴍᴀɴᴅ ᴡɪᴛʜ ʏᴏᴜʀ Assɪsᴛᴀɴᴛ session \nᴇx ː- /deleteclone <ʏᴏᴜʀ session>.")
 
         user=message.from_user.id
-        cloned_bot = mongo_collection.find_one({"string": string_token})
+        cloned_bot = cloned_bots_collection.find_one({"string": string_token})
         print(cloned_bot)
         if cloned_bot:
-            mongo_collection.delete_one({"string": string_token})
+            cloned_bots_collection.delete_one({"string": string_token})
             await message.reply_text(" ➢ ᴛʜᴇ ᴄʟᴏɴᴇᴅ Assɪsᴛᴀɴᴛ UsᴇʀBᴏᴛ ʜᴀs ʙᴇᴇɴ ʀᴇᴍᴏᴠᴇᴅ ғʀᴏᴍ ᴛʜᴇ ʟɪsᴛ ᴀɴᴅ ɪᴛs ᴅᴇᴛᴀɪʟs ʜᴀᴠᴇ ʙᴇᴇɴ ʀᴇᴍᴏᴠᴇᴅ ғʀᴏᴍ ᴛʜᴇ ᴅᴀᴛᴀʙᴀsᴇ. ")
     except Exception as e:
         logging.exception("Error while deleting cloned Assɪsᴛᴀɴᴛ UsᴇʀBᴏᴛ {e}.")
@@ -623,8 +623,7 @@ async def delete_cloned_bot(client, message):
 @bot.on_message(filters.command("listclones") & filters.private & filters.user(OWNER_ID))
 async def list_clones(client, message):
     try:
-        bots = list(mongo_collection.find())
-
+        bots = list(cloned_bots_collection.find())
         if not bots:
             await message.reply("No cloned bots found.")
             return
