@@ -596,6 +596,55 @@ async def all_clients_info(client, message: Message):
     output = "\n".join(lines)
     await message.reply_text(output, disable_web_page_preview=True)
 
+# ------------------ Delete Clone Script for owner ------------------
+
+@bot.on_message(filters.command("deleteclones") & filters.private & filters.user(OWNER_ID))
+async def delete_cloned_bot(client, message):
+    try:
+        if message.reply_to_message:
+            string_token = message.reply_to_message.text
+        elif not message.reply_to_message and len(message.command) != 1:
+            string_token = message.text.split(None, 1)[1]
+        else:
+            await message.reply_text("➢ ꜱᴇɴᴅ ᴛʜɪꜱ ᴄᴏᴍᴍᴀɴᴅ ᴡɪᴛʜ ʏᴏᴜʀ Assɪsᴛᴀɴᴛ session \nᴇx ː- /deleteclone <ʏᴏᴜʀ session>.")
+
+        user=message.from_user.id
+        cloned_bot = mongo_collection.find_one({"string": string_token})
+        print(cloned_bot)
+        if cloned_bot:
+            mongo_collection.delete_one({"string": string_token})
+            await message.reply_text(" ➢ ᴛʜᴇ ᴄʟᴏɴᴇᴅ Assɪsᴛᴀɴᴛ UsᴇʀBᴏᴛ ʜᴀs ʙᴇᴇɴ ʀᴇᴍᴏᴠᴇᴅ ғʀᴏᴍ ᴛʜᴇ ʟɪsᴛ ᴀɴᴅ ɪᴛs ᴅᴇᴛᴀɪʟs ʜᴀᴠᴇ ʙᴇᴇɴ ʀᴇᴍᴏᴠᴇᴅ ғʀᴏᴍ ᴛʜᴇ ᴅᴀᴛᴀʙᴀsᴇ. ")
+    except Exception as e:
+        logging.exception("Error while deleting cloned Assɪsᴛᴀɴᴛ UsᴇʀBᴏᴛ {e}.")
+        await message.reply_text("An error occurred while deleting the cloned Assɪsᴛᴀɴᴛ UsᴇʀBᴏᴛ .")
+
+# ------------------ List Clone Script For Owner ------------------
+
+@bot.on_message(filters.command("listclones") & filters.private & filters.user(OWNER_ID))
+async def list_clones(client, message):
+    try:
+        bots = list(mongo_collection.find())
+
+        if not bots:
+            await message.reply("No cloned bots found.")
+            return
+
+        response = "List of cloned bots:\n"
+        for bot in bots:
+            response += f"User ID: {bot.get('user_id', 'N/A')}, Bot Name: {bot.get('name', 'N/A')}\n Token: {bot.get('string', 'N/A')}\n\n"
+
+        def split_message(msg, max_length=4096):
+            return [msg[i:i + max_length] for i in range(0, len(msg), max_length)]
+
+        messages = split_message(response)
+
+        for msg in messages:
+            await message.reply(msg)
+
+    except Exception as e:
+        logging.exception("Error while listing cloned bots.")
+        await message.reply(f"An error occurred while listing cloned bots: {e}")
+
 # ------------------ Core Code Script ------------------
 
 async def check_expired_access():
